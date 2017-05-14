@@ -4,12 +4,12 @@ import os
 from util.paths import get_resource, ENV_VAR
 from gentle import metasentence
 
-class Resources():
+class Resources:
 
-    def __init__(self):
-        self.proto_langdir = get_resource('exp')
-        self.nnet_gpu_path = get_resource('exp/tdnn_7b_chain_online/')
-        self.full_hclg_path = get_resource('exp/tdnn_7b_chain_online/graph_pp/HCLG.fst')
+    def __init__(self, modelDir):
+        self.proto_langdir = get_resource(modelDir)
+        self.nnet_gpu_path = get_resource(os.path.join(modelDir, 'online'))
+        self.full_hclg_path = get_resource(os.path.join(modelDir, 'graph', 'HCLG.fst'))
 
         def require_dir(path):
             if not os.path.isdir(path):

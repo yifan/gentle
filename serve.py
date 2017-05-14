@@ -27,11 +27,11 @@ class TranscriptionStatus(Resource):
         return json.dumps(self.status_dict)
 
 class Transcriber():
-    def __init__(self, data_dir, nthreads=4, ntranscriptionthreads=2):
+    def __init__(self, data_dir, nthreads=4, ntranscriptionthreads=2, modelDir='exp'):
         self.data_dir = data_dir
         self.nthreads = nthreads
         self.ntranscriptionthreads = ntranscriptionthreads
-        self.resources = gentle.Resources()
+        self.resources = gentle.Resources(modelDir)
 
         self.full_transcriber = gentle.FullTranscriber(self.resources, nthreads=ntranscriptionthreads)
         self._status_dicts = {}
@@ -212,7 +212,7 @@ class TranscriptionZipper(Resource):
         else:
             return Resource.getChild(self, path, req)
 
-def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata')):
+def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata'), modelDir='exp'):
     logging.info("SERVE %d, %s, %d", port, interface, installSignalHandlers)
 
     if not os.path.exists(data_dir):
@@ -228,7 +228,7 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
     f.putChild('status.html', File(get_resource('www/status.html')))
     f.putChild('preloader.gif', File(get_resource('www/preloader.gif')))
 
-    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads)
+    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir)
     trans_ctrl = TranscriptionsController(trans)
     f.putChild('transcriptions', trans_ctrl)
 
@@ -259,6 +259,9 @@ if __name__=='__main__':
     parser.add_argument('--log', default="INFO",
                         help='the log level (DEBUG, INFO, WARNING, ERROR, or CRITICAL)')
 
+    parser.add_argument('--model-dir', default='exp',
+                        help='model directory')
+
     args = parser.parse_args()
 
     log_level = args.log.upper()
@@ -267,4 +270,4 @@ if __name__=='__main__':
     logging.info('gentle %s' % (gentle.__version__))
     logging.info('listening at %s:%d\n' % (args.host, args.port))
 
-    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1)
+    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1, modelDir=args.model_dir)
