@@ -13,6 +13,9 @@ class Kaldi:
         if nnet_dir is not None:
             cmd.append(nnet_dir)
             cmd.append(hclg_path)
+            with open(os.path.join(nnet_dir, 'silencephones.txt')) as f:
+              silencephones = f.readline().strip()
+              cmd.append(silencephones)
 
         self._p = subprocess.Popen(cmd,
                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE,
