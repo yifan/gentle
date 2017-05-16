@@ -29,6 +29,9 @@ parser.add_argument(
         '--model-dir', default="exp",
         help='exp directory')
 parser.add_argument(
+        '--context-width', default="3",
+        help='phone context width')
+parser.add_argument(
         'audiofile', type=str,
         help='audio file')
 parser.add_argument(
@@ -54,7 +57,7 @@ logging.info("converting audio to 8K sampled wav")
 
 with gentle.resampled(args.audiofile) as wavfile:
     logging.info("starting alignment")
-    aligner = gentle.ForcedAligner(resources, transcript, nthreads=args.nthreads, disfluency=args.disfluency, conservative=args.conservative, disfluencies=disfluencies)
+    aligner = gentle.ForcedAligner(resources, transcript, nthreads=args.nthreads, context_width=args.context_width, disfluency=args.disfluency, conservative=args.conservative, disfluencies=disfluencies)
     result = aligner.transcribe(wavfile, progress_cb=on_progress, logging=logging)
 
 fh = open(args.output, 'w') if args.output else sys.stdout

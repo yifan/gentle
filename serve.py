@@ -27,11 +27,12 @@ class TranscriptionStatus(Resource):
         return json.dumps(self.status_dict)
 
 class Transcriber():
-    def __init__(self, data_dir, nthreads=4, ntranscriptionthreads=2, modelDir='exp'):
+    def __init__(self, data_dir, nthreads=4, ntranscriptionthreads=2, modelDir='exp', contextWidth="3"):
         self.data_dir = data_dir
         self.nthreads = nthreads
         self.ntranscriptionthreads = ntranscriptionthreads
         self.resources = gentle.Resources(modelDir)
+        self.context_width = contextWidth
 
         self.full_transcriber = gentle.FullTranscriber(self.resources, nthreads=ntranscriptionthreads)
         self._status_dicts = {}
@@ -90,7 +91,7 @@ class Transcriber():
                 status[k] = v
 
         if len(transcript.strip()) > 0:
-            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, **kwargs)
+            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, context_width=self.context_width, **kwargs)
         elif self.full_transcriber.available:
             trans = self.full_transcriber
         else:
@@ -212,7 +213,7 @@ class TranscriptionZipper(Resource):
         else:
             return Resource.getChild(self, path, req)
 
-def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata'), modelDir='exp'):
+def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata'), modelDir='exp', contextWidth='3'):
     logging.info("SERVE %d, %s, %d", port, interface, installSignalHandlers)
 
     if not os.path.exists(data_dir):
@@ -228,7 +229,7 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
     f.putChild('status.html', File(get_resource('www/status.html')))
     f.putChild('preloader.gif', File(get_resource('www/preloader.gif')))
 
-    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir)
+    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir, contextWidth=contextWidth)
     trans_ctrl = TranscriptionsController(trans)
     f.putChild('transcriptions', trans_ctrl)
 
@@ -261,6 +262,8 @@ if __name__=='__main__':
 
     parser.add_argument('--model-dir', default='exp',
                         help='model directory')
+    parser.add_argument('--context-width', default='3',
+                        help='phone context width')
 
     args = parser.parse_args()
 
@@ -270,4 +273,4 @@ if __name__=='__main__':
     logging.info('gentle %s' % (gentle.__version__))
     logging.info('listening at %s:%d\n' % (args.host, args.port))
 
-    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1, modelDir=args.model_dir)
+    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1, modelDir=args.model_dir, contextWidth=args.context_width)
