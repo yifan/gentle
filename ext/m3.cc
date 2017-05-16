@@ -15,16 +15,18 @@ int main(int argc, char *argv[]) {
 	try {
 		const char *usage = "Usage: ./mkgraph [options] <proto-dir> <grammar-fst> <out-fst>\n";
 		
+
+		int32 N = 3, P = 1;
+		float transition_scale = 1.0;
+		float self_loop_scale = 0.1;
+
 		ParseOptions po(usage);
+		po.Register("N", &N, "context width");
 		po.Read(argc, argv);
 		if (po.NumArgs() != 3) {
 			po.PrintUsage();
 			return 1;
 		}
-
-		int32 N = 3, P = 1;
-		float transition_scale = 1.0;
-		float self_loop_scale = 0.1;
 
 		std::string proto_dir = po.GetArg(1),
 					grammar_fst_filename = po.GetArg(2),
