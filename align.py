@@ -53,7 +53,7 @@ with open(args.txtfile) as fh:
     transcript = fh.read()
 
 resources = gentle.Resources(args.model_dir)
-logging.info("converting audio to 8K sampled wav")
+logging.info("converting audio to {} sampled wav".format(args.sample_rate))
 
 with gentle.resampled(args.audiofile) as wavfile:
     logging.info("starting alignment")
