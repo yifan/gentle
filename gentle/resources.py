@@ -9,7 +9,7 @@ class Resources:
     def __init__(self, modelDir):
         self.proto_langdir = get_resource(modelDir)
         self.nnet_gpu_path = get_resource(os.path.join(modelDir, 'online'))
-        self.full_hclg_path = get_resource(os.path.join(modelDir, 'graph', 'HCLG.fst'))
+        self.full_hclg_path = get_resource(os.path.join(self.nnet_gpu_path, 'graph', 'HCLG.fst'))
 
         def require_dir(path):
             if not os.path.isdir(path):
