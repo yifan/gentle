@@ -33,6 +33,7 @@ class Transcriber():
         self.ntranscriptionthreads = ntranscriptionthreads
         self.resources = gentle.Resources(modelDir)
         self.context_width = contextWidth
+        self.samplerate = samplerate
 
         self.full_transcriber = gentle.FullTranscriber(self.resources, nthreads=ntranscriptionthreads)
         self._status_dicts = {}
@@ -71,7 +72,7 @@ class Transcriber():
         status['status'] = 'ENCODING'
 
         wavfile = os.path.join(outdir, 'a.wav')
-        if gentle.resample(os.path.join(outdir, 'upload'), wavfile, samplerate) != 0:
+        if gentle.resample(os.path.join(outdir, 'upload'), wavfile, self.samplerate) != 0:
             status['status'] = 'ERROR'
             status['error'] = "Encoding failed. Make sure that you've uploaded a valid media file."
             # Save the status so that errors are recovered on restart of the server
