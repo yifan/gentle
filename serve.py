@@ -32,8 +32,7 @@ class Transcriber():
         self.nthreads = nthreads
         self.ntranscriptionthreads = ntranscriptionthreads
         self.resources = gentle.Resources(modelDir)
-        self.context_width = contextWidth
-        self.samplerate = samplerate
+        self.config = self.resources.getConfig()
 
         self.full_transcriber = gentle.FullTranscriber(self.resources, nthreads=ntranscriptionthreads)
         self._status_dicts = {}
@@ -72,7 +71,7 @@ class Transcriber():
         status['status'] = 'ENCODING'
 
         wavfile = os.path.join(outdir, 'a.wav')
-        if gentle.resample(os.path.join(outdir, 'upload'), wavfile, self.samplerate) != 0:
+        if gentle.resample(os.path.join(outdir, 'upload'), wavfile, self.config['samplerate']) != 0:
             status['status'] = 'ERROR'
             status['error'] = "Encoding failed. Make sure that you've uploaded a valid media file."
             # Save the status so that errors are recovered on restart of the server
@@ -92,7 +91,7 @@ class Transcriber():
                 status[k] = v
 
         if len(transcript.strip()) > 0:
-            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, context_width=self.context_width, **kwargs)
+            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, context_width=self.config['context_width'], **kwargs)
         elif self.full_transcriber.available:
             trans = self.full_transcriber
         else:
@@ -214,7 +213,7 @@ class TranscriptionZipper(Resource):
         else:
             return Resource.getChild(self, path, req)
 
-def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata'), modelDir='exp', contextWidth='3', samplerate=8000):
+def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, ntranscriptionthreads=2, data_dir=get_datadir('webdata'), modelDir='exp'):
     logging.info("SERVE %d, %s, %d", port, interface, installSignalHandlers)
 
     if not os.path.exists(data_dir):
@@ -263,10 +262,6 @@ if __name__=='__main__':
 
     parser.add_argument('--model-dir', default='exp',
                         help='model directory')
-    parser.add_argument('--sample-rate', default=8000,
-                        help='model sampling rate')
-    parser.add_argument('--context-width', default='3',
-                        help='phone context width')
 
     args = parser.parse_args()
 
@@ -276,4 +271,4 @@ if __name__=='__main__':
     logging.info('gentle %s' % (gentle.__version__))
     logging.info('listening at %s:%d\n' % (args.host, args.port))
 
-    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1, modelDir=args.model_dir, contextWidth=args.context_width, samplerate=args.sample_rate)
+    serve(args.port, args.host, nthreads=args.nthreads, ntranscriptionthreads=args.ntranscriptionthreads, installSignalHandlers=1, modelDir=args.model_dir)

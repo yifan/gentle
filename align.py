@@ -3,7 +3,6 @@ import logging
 import multiprocessing
 import os
 import sys
-
 import gentle
 
 parser = argparse.ArgumentParser(
@@ -53,11 +52,12 @@ with open(args.txtfile) as fh:
     transcript = fh.read()
 
 resources = gentle.Resources(args.model_dir)
+config = resources.getConfig()
 logging.info("converting audio to {} sampled wav".format(args.sample_rate))
 
 with gentle.resampled(args.audiofile) as wavfile:
     logging.info("starting alignment")
-    aligner = gentle.ForcedAligner(resources, transcript, nthreads=args.nthreads, context_width=args.context_width, disfluency=args.disfluency, conservative=args.conservative, disfluencies=disfluencies)
+    aligner = gentle.ForcedAligner(resources, transcript, nthreads=args.nthreads, context_width=config['context_width'], disfluency=args.disfluency, conservative=args.conservative, disfluencies=disfluencies)
     result = aligner.transcribe(wavfile, progress_cb=on_progress, logging=logging)
 
 fh = open(args.output, 'w') if args.output else sys.stdout
