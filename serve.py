@@ -91,7 +91,7 @@ class Transcriber():
                 status[k] = v
 
         if len(transcript.strip()) > 0:
-            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, context_width=self.config['context_width'], **kwargs)
+            trans = gentle.ForcedAligner(self.resources, transcript, nthreads=self.nthreads, context_width=self.config['context-width'], **kwargs)
         elif self.full_transcriber.available:
             trans = self.full_transcriber
         else:
