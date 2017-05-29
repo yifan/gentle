@@ -228,8 +228,10 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
     f.putChild('', File(get_resource('www/index.html')))
     f.putChild('status.html', File(get_resource('www/status.html')))
     f.putChild('preloader.gif', File(get_resource('www/preloader.gif')))
-
-    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir, contextWidth=contextWidth, samplerate=samplerate)
+   
+    resources = Resources(modelDir)
+    config = resources.getConfig()
+    trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir, contextWidth=config['context-width'], samplerate=config['samplerate'])
     trans_ctrl = TranscriptionsController(trans)
     f.putChild('transcriptions', trans_ctrl)
 
