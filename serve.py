@@ -231,6 +231,8 @@ def serve(port=8765, interface='0.0.0.0', installSignalHandlers=0, nthreads=4, n
    
     resources = gentle.Resources(modelDir)
     trans = Transcriber(data_dir, nthreads=nthreads, ntranscriptionthreads=ntranscriptionthreads, modelDir=modelDir)
+    config = trans.config
+    logging.info("CONFIG: samplerate %d, silencephones %s, context-width %s", config['samplerate'], config['silencephones'], config['context-width'])
     trans_ctrl = TranscriptionsController(trans)
     f.putChild('transcriptions', trans_ctrl)
 

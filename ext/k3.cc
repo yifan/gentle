@@ -9,7 +9,7 @@
 #include "lat/lattice-functions.h"
 #include "lat/word-align-lattice.h"
 
-const int arate = 8000;
+const int arate = 16000;
     
 void ConfigFeatureInfo(kaldi::OnlineNnet2FeaturePipelineInfo& info,
                        std::string ivector_model_dir) {

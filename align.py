@@ -50,7 +50,7 @@ with open(args.txtfile) as fh:
 
 resources = gentle.Resources(args.model_dir)
 config = resources.getConfig()
-logging.info("converting audio to {} sampled wav".format(args.sample_rate))
+logging.info("converting audio to {} sampled wav".format(config['samplerate']))
 
 with gentle.resampled(args.audiofile) as wavfile:
     logging.info("starting alignment")

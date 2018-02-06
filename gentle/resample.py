@@ -17,7 +17,7 @@ def resample(infile, outfile, samplerate=8000):
     Use FFMPEG to convert a media file to a wav file sampled at 8K
     '''
     return subprocess.call([FFMPEG,
-                            '-loglevel', 'panic',
+                            '-loglevel', 'info',
                             '-y',
                             '-i', infile,
                             '-ac', '1', '-ar', '{}'.format(samplerate),
